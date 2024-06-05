@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 
 
@@ -20,13 +20,18 @@ export const Like = ({ i }) => {
       const jsonString = "[" + content.replace(/(\w+):/g, '"$1":') + "]";
       const array = JSON.parse(jsonString);
       if (type == 'star') {
-        array[i].stare = val
+        if (val == 1 && array[i].stare == 1) {
+          array[i].stare = 0
+        }
+        else {
+          array[i].stare = val
+        }
       }
       else if (type == 'like') {
-        array[i].like = true
+        array[i].like = !array[i].like
       }
       else if (type == 'dislike') {
-        array[i].disLike = true
+        array[i].disLike = !array[i].disLike
       }
       const reconstructedString = array.map(obj => {
         return `{${Object.entries(obj).map(([key, value]) => `${key}:${value}`).join(",")}}`;
@@ -70,12 +75,10 @@ export const Like = ({ i }) => {
     // writeFile()
   }, [])
 
-  useEffect(() => {
-
-  }, [])
-
 
   return <View style={styles.stars}>
+    <Text>{JSON.stringify(filePath)}</Text>
+
     <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
       {data[i]?.like ?
         <Image style={{ width: 40, height: 40 }} source={require("../../assets/like2.png")} /> :

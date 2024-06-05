@@ -21,13 +21,18 @@ export const HoriznotalLike = ({ i }) => {
       const jsonString = "[" + content.replace(/(\w+):/g, '"$1":') + "]";
       const array = JSON.parse(jsonString);
       if (type == 'star') {
-        array[i].stare = val
+        if (val == 1 && array[i].stare == 1) {
+          array[i].stare = 0
+        }
+        else {
+          array[i].stare = val
+        }
       }
       else if (type == 'like') {
-        array[i].like = true
+        array[i].like = !array[i].like
       }
       else if (type == 'dislike') {
-        array[i].disLike = true
+        array[i].disLike = !array[i].disLike
       }
       const reconstructedString = array.map(obj => {
         return `{${Object.entries(obj).map(([key, value]) => `${key}:${value}`).join(",")}}`;
@@ -37,19 +42,12 @@ export const HoriznotalLike = ({ i }) => {
       readFile()
       console.log('File modified and saved successfully.', reconstructedString);
     } catch (error) {
+      Alert.alert(JSON.stringify(error))
       console.error('Error reading or writing file:', error);
     }
   };
 
 
-  const writeFile = async () => {
-    try {
-      await RNFS.writeFile(filePath, "{image:1,stare:0,like:false,disLike:false},{image:2,stare:0,like:false,disLike:false},{image:3,stare:0,like:false,disLike:false},{image:4,stare:0,like:false,disLike:false}", 'utf8');
-      console.log('File modified and saved successfully.');
-    } catch (error) {
-      console.error('Error reading or writing file:', error);
-    }
-  };
 
   const readFile = async () => {
     try {
@@ -67,7 +65,6 @@ export const HoriznotalLike = ({ i }) => {
 
   useEffect(() => {
     readFile()
-    // writeFile()
   }, [])
 
 

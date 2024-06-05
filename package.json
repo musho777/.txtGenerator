@@ -10,14 +10,19 @@
     "test": "jest"
   },
   "dependencies": {
+    "@openspacelabs/react-native-zoomable-view": "^2.1.6",
     "react": "18.2.0",
     "react-native": "0.74.2",
     "react-native-carousel": "^0.12.0",
     "react-native-fs": "^2.20.0",
+    "react-native-gesture-handler": "^2.16.2",
     "react-native-image-viewing": "^0.2.2",
+    "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-stars": "^1.2.2",
-    "react-native-swiper-flatlist": "^3.2.4"
+    "react-native-swiper": "^1.6.0",
+    "react-native-swiper-flatlist": "^3.2.4",
+    "react-native-zoomable-view": "^0.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

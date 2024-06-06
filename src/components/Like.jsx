@@ -11,15 +11,15 @@ export const Like = ({ i, ChangeFile, data }) => {
 
 
   return <View style={styles.stars}>
-    <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
-      {data[i]?.like ?
-        <Image style={{ width: 40, height: 40 }} source={require("../../assets/like2.png")} /> :
-        <Image style={{ width: 40, height: 40 }} source={require("../../assets/like3.png")} />
+    <TouchableOpacity onPress={() => ChangeFile(0, 'dislike')}>
+      {(data[i]?.type == "N" || data[i]?.type == "X") ?
+        <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike2.png')} /> :
+        <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike1.png')} />
       }
     </TouchableOpacity>
     <View style={{ flexDirection: 'row', gap: 15 }}>
       {emptyStarIcons.map((elm, index) => {
-        if (data[i]?.stare > index) {
+        if (data[i]?.value > index) {
           return <View key={index}>
             <TouchableOpacity onPress={() => ChangeFile(index + 1, 'star')}>
               <Image source={require('../../assets/star1.png')} style={{ width: 40, height: 40 }} />
@@ -34,12 +34,13 @@ export const Like = ({ i, ChangeFile, data }) => {
       })}
     </View>
 
-    <TouchableOpacity onPress={() => ChangeFile(0, 'dislike')}>
-      {data[i]?.disLike ?
-        <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike2.png')} /> :
-        <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike1.png')} />
+    <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
+      {(data[i]?.type == "Y" || data[i]?.type == "X") ?
+        <Image style={{ width: 40, height: 40 }} source={require("../../assets/like2.png")} /> :
+        <Image style={{ width: 40, height: 40 }} source={require("../../assets/like3.png")} />
       }
     </TouchableOpacity>
+
   </View>
 }
 

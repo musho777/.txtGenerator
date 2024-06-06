@@ -1,5 +1,5 @@
 
-import { Dimensions, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Alert, Dimensions, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
@@ -25,18 +25,26 @@ export const Slider = () => {
   const getPhotosInFolder = async () => {
     try {
       let content = await RNFS.readFile(filePath, 'utf8')
-      let array = JSON.parse("[" + content.replace(/}{/g, "},{") + "]");
+      let a = content
+      const lines = content.split('\n');
+      let array = []
 
+      if (content.length > 1) {
+        array = lines.map(line => {
+          const [url, type, value] = line.split(';');
+          return { url, type, value };
+        });
+      }
       RNFS.readDir(folderPath).then((r) => {
         const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
-
         photoFile.map((elm, i) => {
-          if (!array.some(obj => obj.url.includes(`file://${elm.path}`))) {
-            array.push({ url: `file://${elm.path}`, stare: 0, like: false, disLike: false })
+          console.log(a.includes(elm.path))
+          if (!a.includes(elm.path)) {
+            array.push({ url: `file://${elm.path}`, value: "", type: "" })
           }
         })
         setData(array)
-        content = array.map(obj => JSON.stringify(obj)).join('');
+        let content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
         RNFS.writeFile(filePath, content, 'utf8');
       })
 
@@ -45,26 +53,43 @@ export const Slider = () => {
     }
   };
 
-
   const ChangeFile = async (val, type, i) => {
     try {
       let content = await RNFS.readFile(filePath, 'utf8')
-      let array = JSON.parse("[" + content.replace(/}{/g, "},{") + "]");
+
       if (type == 'star') {
-        if (val == 1 && array[i].stare == 1) {
-          array[i].stare = 0
+        if (val == 1 && data[i].stare == 1) {
+          data[i].value = 0
         }
         else {
-          array[i].stare = val
+          data[i].value = val
         }
       }
       else if (type == 'like') {
-        array[i].like = !array[i].like
+        console.log(data[i].type, 'like')
+        if (!data[i].type) {
+          console.log(11)
+          data[i].type = "Y"
+        }
+        else if (data[i].type == "Y") {
+          data[i].type = ""
+        }
+        else if (data[i].type == 'N') {
+          data[i].type = "X"
+        }
       }
       else if (type == 'dislike') {
-        array[i].disLike = !array[i].disLike
+        if (!data[i].type) {
+          data[i].type = "N"
+        }
+        else if (data[i].type == "N") {
+          data[i].type = ""
+        }
+        else if (data[i].type == 'Y') {
+          data[i].type = "X"
+        }
       }
-      content = array.map(obj => JSON.stringify(obj)).join('');
+      content = data.map(item => `${item.url};${item.type};${item.value}`).join('\n');
       await RNFS.writeFile(filePath, content, 'utf8');
       readFile()
     } catch (error) {
@@ -95,7 +120,16 @@ export const Slider = () => {
   const readFile = async () => {
     try {
       const content = await RNFS.readFile(filePath, 'utf8')
-      let array = JSON.parse("[" + content.replace(/}{/g, "},{") + "]");
+      let a = content
+      const lines = content.split('\n');
+      let array = []
+
+      if (content.length > 1) {
+        array = lines.map(line => {
+          const [url, type, value] = line.split(';');
+          return { url, type, value };
+        });
+      }
       setData(array)
     } catch (error) {
       console.error('Error reading or writing file:', error);

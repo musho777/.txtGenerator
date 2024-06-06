@@ -18,7 +18,7 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
 
   return <View style={styles.stars}>
     <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
-      {data[i]?.like ?
+      {(data[i]?.type == "N" || data[i]?.type == "X") ?
         <Image style={{ width: 40, height: 40 }} source={require("../../assets/like2.png")} /> :
         <Image style={{ width: 40, height: 40 }} source={require("../../assets/like3.png")} />
       }
@@ -41,7 +41,7 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
     </View>
 
     <TouchableOpacity onPress={() => ChangeFile(0, 'dislike')}>
-      {data[i]?.disLike ?
+      {(data[i]?.type == "N" || data[i]?.type == "X") ?
         <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike2.png')} /> :
         <Image style={{ width: 40, height: 40 }} source={require('../../assets/dislike1.png')} />
       }

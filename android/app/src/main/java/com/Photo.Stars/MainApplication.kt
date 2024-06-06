@@ -1,4 +1,4 @@
-package com.photos
+package com.Photo.Star
 
 import android.app.Application
 import com.facebook.react.PackageList

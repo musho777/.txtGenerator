@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import RNFS from 'react-native-fs';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 
-export const Like = ({ i }) => {
-  const [data, setData] = useState([])
+export const Like = ({ i, ChangeFile, data }) => {
 
   const emptyStarIcons = [
     require('../../assets/star11.png'),
@@ -12,73 +9,8 @@ export const Like = ({ i }) => {
     require('../../assets/star3.png')
   ];
 
-  const filePath = `${RNFS.DocumentDirectoryPath}/test.txt`;
-
-  const ChangeFile = async (val, type) => {
-    try {
-      const content = await RNFS.readFile(filePath, 'utf8')
-      const jsonString = "[" + content.replace(/(\w+):/g, '"$1":') + "]";
-      const array = JSON.parse(jsonString);
-      if (type == 'star') {
-        if (val == 1 && array[i].stare == 1) {
-          array[i].stare = 0
-        }
-        else {
-          array[i].stare = val
-        }
-      }
-      else if (type == 'like') {
-        array[i].like = !array[i].like
-      }
-      else if (type == 'dislike') {
-        array[i].disLike = !array[i].disLike
-      }
-      const reconstructedString = array.map(obj => {
-        return `{${Object.entries(obj).map(([key, value]) => `${key}:${value}`).join(",")}}`;
-      }).join(",");
-
-      await RNFS.writeFile(filePath, reconstructedString, 'utf8');
-      readFile()
-      console.log('File modified and saved successfully.', reconstructedString);
-    } catch (error) {
-      Alert.alert(JSON.stringify(error))
-      console.error('Error reading or writing file:', error);
-    }
-  };
-
-
-  const writeFile = async () => {
-    try {
-      await RNFS.writeFile(filePath, "{image:1,stare:0,like:false,disLike:false},{image:2,stare:0,like:false,disLike:false},{image:3,stare:0,like:false,disLike:false},{image:4,stare:0,like:false,disLike:false}", 'utf8');
-      console.log('File modified and saved successfully.');
-    } catch (error) {
-      console.error('Error reading or writing file:', error);
-    }
-  };
-
-  const readFile = async () => {
-    try {
-      const content = await RNFS.readFile(filePath, 'utf8')
-      const jsonString = "[" + content.replace(/(\w+):/g, '"$1":') + "]";
-      const array = JSON.parse(jsonString);
-      setData(array)
-    } catch (error) {
-      console.error('Error reading or writing file:', error);
-    }
-  };
-
-
-
-
-  useEffect(() => {
-    readFile()
-    // writeFile()
-  }, [])
-
 
   return <View style={styles.stars}>
-    <Text>{JSON.stringify(filePath)}</Text>
-
     <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
       {data[i]?.like ?
         <Image style={{ width: 40, height: 40 }} source={require("../../assets/like2.png")} /> :
@@ -111,8 +43,6 @@ export const Like = ({ i }) => {
   </View>
 }
 
-const { width } = Dimensions.get('window');
-const { height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   stars: {
     height: 50,

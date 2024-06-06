@@ -1,12 +1,11 @@
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import ImageZoom from 'react-native-image-pan-zoom';
-export const ZoomImage = ({ img }) => {
+export const ZoomImage = () => {
   return <View style={{ borderWidth: 1 }}>
     <ImageZoom cropWidth={Dimensions.get('window').width}
       cropHeight={Dimensions.get('window').height}
       imageWidth={200}
       imageHeight={200}>
-
       <Image
         style={styles.child}
         source={{ uri: 'https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI0LTAxL3Jhd3BpeGVsb2ZmaWNlM19zaW1wbGVfbWluaW1hbGlzdF9waG90b19vZl9tb3VudGFpbl9hbmRfbW9vbl9pbl8zNTcwMjM0My1jM2FjLTRlZmItYjgyNS1lMTIwNmYwYTAwNWVfMS5qcGc.jpg' }} />

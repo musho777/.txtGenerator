@@ -13,17 +13,8 @@ export const Slider = () => {
   const [width, setWidth] = useState()
   const [height, setHeight] = useState()
 
-  const detectOrientation = () => {
-    const { width, height } = Dimensions.get('window');
-    if (width > height) {
-      // setOrientation('landscape');
-    } else {
-      // setOrientation('portrait');
-    }
-  };
 
   const [isHorizontal, setIsHorizontal] = useState(Dimensions.get('window').width > Dimensions.get('window').height);
-  const windowDimensions = useWindowDimensions();
   const folderPath = `${RNFS.ExternalDirectoryPath}/spec`;
 
   const filePath = `${RNFS.ExternalDirectoryPath}/spec/test.txt`;
@@ -39,45 +30,81 @@ export const Slider = () => {
 
     Dimensions.addEventListener('change', handleOrientationChange);
 
-    // Initial check
     handleOrientationChange();
 
     return () => {
       Dimensions.removeEventListener('change', handleOrientationChange);
     };
   }, []);
-  // useEffect(() => {
-  //   setIsHorizontal(windowDimensions.width > windowDimensions.height);
-  // }, [windowDimensions]);
 
-  const getPhotosInFolder = async () => {
-    try {
-      let content = await RNFS.readFile(filePath, 'utf8')
-      let a = content
-      const lines = content.split('\n');
-      let array = []
+  // const getPhotosInFolder = async () => {
+  //   try {
+  //     let content = await RNFS.readFile(filePath, 'utf8')
+  //     let a = content
+  //     const lines = content.split('\n');
+  //     let array = []
 
-      if (content.length > 1) {
-        array = lines.map(line => {
-          const [url, type, value] = line.split(';');
-          return { url, type, value };
-        });
+  //     if (content.length > 1) {
+  //       array = lines.map(line => {
+  //         const [url, type, value] = line.split(';');
+  //         return { url, type, value };
+  //       });
+  //     }
+  //     RNFS.readDir(folderPath).then((r) => {
+  //       const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
+  //       photoFile.map((elm, i) => {
+  //         if (!a.includes(elm.path)) {
+  //           array.push({ url: `file://${elm.path}`, value: "", type: "" })
+  //         }
+  //       })
+  //       setData(array)
+  //       let content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
+  //       RNFS.writeFile(filePath, content, 'utf8');
+  //     })
+
+  //   } catch (error) {
+  //     console.error("Error reading folder: ", error);
+  //   }
+  // };
+
+
+  const getImagesFromFolder = async (folderPath) => {
+    const result = await RNFS.readDir(folderPath);
+    let images = [];
+    for (const item of result) {
+      if (item.isDirectory()) {
+        const nestedImages = await getImagesFromFolder(item.path);
+        images = images.concat(nestedImages);
+      } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp'))) {
+        images.push(item.path);
       }
-      RNFS.readDir(folderPath).then((r) => {
-        const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
-        photoFile.map((elm, i) => {
-          if (!a.includes(elm.path)) {
-            array.push({ url: `file://${elm.path}`, value: "", type: "" })
-          }
-        })
-        setData(array)
-        let content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
-        RNFS.writeFile(filePath, content, 'utf8');
-      })
-
-    } catch (error) {
-      console.error("Error reading folder: ", error);
     }
+
+    let content = await RNFS.readFile(filePath, 'utf8')
+    let a = content
+    const lines = content.split('\n');
+    let array = []
+
+    if (content.length > 1) {
+      array = lines.map(line => {
+        const [url, type, value] = line.split(';');
+        return { url, type, value };
+      });
+    }
+
+    // const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
+    images.map((elm, i) => {
+      console.log(elm, '-')
+      if (!a.includes(elm)) {
+        array.push({ url: `file://${elm}`, value: "", type: "" })
+      }
+    })
+    setData(array)
+    content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
+    RNFS.writeFile(filePath, content, 'utf8');
+
+    console.log(images, '22222')
+    return images;
   };
 
   const ChangeFile = async (val, type, i) => {
@@ -102,6 +129,9 @@ export const Slider = () => {
         else if (data[i].type == 'N') {
           data[i].type = "X"
         }
+        else if (data[i].type == 'X') {
+          data[i].type = "N"
+        }
       }
       else if (type == 'dislike') {
         if (!data[i].type) {
@@ -112,6 +142,9 @@ export const Slider = () => {
         }
         else if (data[i].type == 'Y') {
           data[i].type = "X"
+        }
+        else if (data[i].type == 'X') {
+          data[i].type = "Y"
         }
       }
       content = data.map(item => `${item.url};${item.type};${item.value}`).join('\n');
@@ -129,13 +162,13 @@ export const Slider = () => {
       if (!folderExists) {
         await RNFS.mkdir(folderPath);
         await RNFS.writeFile(filePath, "", 'utf8');
-        getPhotosInFolder()
+        getImagesFromFolder(folderPath)
       } else {
         const txtExists = await RNFS.exists(filePath);
         if (!txtExists) {
           await RNFS.writeFile(filePath, "", 'utf8');
         }
-        getPhotosInFolder()
+        getImagesFromFolder(folderPath)
       }
       readFile()
     } catch (error) {

@@ -6,21 +6,49 @@ import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFS from 'react-native-fs';
 import { HoriznotalLike } from './horiznotalLike';
-
+import Orientation from 'react-native-orientation-locker';
 
 export const Slider = () => {
   const [data, setData] = useState([])
+  const [width, setWidth] = useState()
+  const [height, setHeight] = useState()
 
+  const detectOrientation = () => {
+    const { width, height } = Dimensions.get('window');
+    if (width > height) {
+      // setOrientation('landscape');
+    } else {
+      // setOrientation('portrait');
+    }
+  };
 
   const [isHorizontal, setIsHorizontal] = useState(Dimensions.get('window').width > Dimensions.get('window').height);
   const windowDimensions = useWindowDimensions();
-  const folderPath = `${RNFS.DocumentDirectoryPath}/spec`;
+  const folderPath = `${RNFS.ExternalDirectoryPath}/spec`;
 
-  const filePath = `${RNFS.DocumentDirectoryPath}/spec/test.txt`;
+  const filePath = `${RNFS.ExternalDirectoryPath}/spec/test.txt`;
+
 
   useEffect(() => {
-    setIsHorizontal(windowDimensions.width > windowDimensions.height);
-  }, [windowDimensions]);
+    const handleOrientationChange = () => {
+      const { width, height } = Dimensions.get('window');
+      setWidth(width)
+      setHeight(height)
+      setIsHorizontal(width > height);
+    };
+
+    Dimensions.addEventListener('change', handleOrientationChange);
+
+    // Initial check
+    handleOrientationChange();
+
+    return () => {
+      Dimensions.removeEventListener('change', handleOrientationChange);
+    };
+  }, []);
+  // useEffect(() => {
+  //   setIsHorizontal(windowDimensions.width > windowDimensions.height);
+  // }, [windowDimensions]);
 
   const getPhotosInFolder = async () => {
     try {
@@ -38,7 +66,6 @@ export const Slider = () => {
       RNFS.readDir(folderPath).then((r) => {
         const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
         photoFile.map((elm, i) => {
-          console.log(a.includes(elm.path))
           if (!a.includes(elm.path)) {
             array.push({ url: `file://${elm.path}`, value: "", type: "" })
           }
@@ -66,9 +93,7 @@ export const Slider = () => {
         }
       }
       else if (type == 'like') {
-        console.log(data[i].type, 'like')
         if (!data[i].type) {
-          console.log(11)
           data[i].type = "Y"
         }
         else if (data[i].type == "Y") {
@@ -149,6 +174,8 @@ export const Slider = () => {
   const handleChange = (index) => {
     setActiveIndex(index);
   };
+
+
   return <View style={styles.container}>
     <SwiperFlatList
       autoplayLoop
@@ -157,7 +184,7 @@ export const Slider = () => {
       renderItem={({ item, i }) => {
         return <View key={i} style={!isHorizontal ? styles.wrapper : styles.horizontalwrapper}>
           {isHorizontal && <HoriznotalLike data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
-          <ImageViewer
+          {isHorizontal ? <ImageViewer
             renderIndicator={() => { }}
             renderFooter={() => { }}
             renderHeader={() => { }}
@@ -166,10 +193,23 @@ export const Slider = () => {
             menuContext={{}}
             onChange={handleChange}
             saveToLocalByLongPress={false}
-            style={!isHorizontal ? styles.child : styles.child1}
+            style={{ width: width - 75, height: height }}
             imageUrls={data}
-            backgroundColor={'white'}
+            backgroundColor={'black'}
+          /> : <ImageViewer
+            renderIndicator={() => { }}
+            renderFooter={() => { }}
+            renderHeader={() => { }}
+            renderArrowLeft={() => { }}
+            footerContainerStyle={{ display: 'none' }}
+            menuContext={{}}
+            onChange={handleChange}
+            saveToLocalByLongPress={false}
+            style={{ width: width, height: height + 75 }}
+            imageUrls={data}
+            backgroundColor={'black'}
           />
+          }
           {!isHorizontal && <Like data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
         </View>
       }}

@@ -1,12 +1,10 @@
 
-import { Alert, Dimensions, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { SwiperFlatList } from 'react-native-swiper-flatlist';
+import { Alert, Dimensions, StyleSheet, View } from 'react-native';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFS from 'react-native-fs';
 import { HoriznotalLike } from './horiznotalLike';
-import Orientation from 'react-native-orientation-locker';
 
 export const Slider = () => {
   const [data, setData] = useState([])
@@ -37,37 +35,6 @@ export const Slider = () => {
     };
   }, []);
 
-  // const getPhotosInFolder = async () => {
-  //   try {
-  //     let content = await RNFS.readFile(filePath, 'utf8')
-  //     let a = content
-  //     const lines = content.split('\n');
-  //     let array = []
-
-  //     if (content.length > 1) {
-  //       array = lines.map(line => {
-  //         const [url, type, value] = line.split(';');
-  //         return { url, type, value };
-  //       });
-  //     }
-  //     RNFS.readDir(folderPath).then((r) => {
-  //       const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
-  //       photoFile.map((elm, i) => {
-  //         if (!a.includes(elm.path)) {
-  //           array.push({ url: `file://${elm.path}`, value: "", type: "" })
-  //         }
-  //       })
-  //       setData(array)
-  //       let content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
-  //       RNFS.writeFile(filePath, content, 'utf8');
-  //     })
-
-  //   } catch (error) {
-  //     console.error("Error reading folder: ", error);
-  //   }
-  // };
-
-
   const getImagesFromFolder = async (folderPath) => {
     const result = await RNFS.readDir(folderPath);
     let images = [];
@@ -75,7 +42,7 @@ export const Slider = () => {
       if (item.isDirectory()) {
         const nestedImages = await getImagesFromFolder(item.path);
         images = images.concat(nestedImages);
-      } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp'))) {
+      } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp') || item.name.endsWith('.jpeg') || item.name.endsWith('.avif'))) {
         images.push(item.path);
       }
     }
@@ -84,26 +51,30 @@ export const Slider = () => {
     let a = content
     const lines = content.split('\n');
     let array = []
+    let array2 = []
 
     if (content.length > 1) {
       array = lines.map(line => {
         const [url, type, value] = line.split(';');
         return { url, type, value };
       });
+      array2 = lines.map(line => {
+        const [url, type, value] = line.split(';');
+        console.log(url)
+        return { url: `file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec${url}`, type, value };
+      });
     }
 
-    // const photoFile = r.filter(file => file.name && /\.(jpg|jpeg|png|webp)$/i.test(file.name));
     images.map((elm, i) => {
-      console.log(elm, '-')
-      if (!a.includes(elm)) {
-        array.push({ url: `file://${elm}`, value: "", type: "" })
+      console.log(elm)
+      if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
+        array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
       }
     })
-    setData(array)
+    setData(array2)
     content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
     RNFS.writeFile(filePath, content, 'utf8');
 
-    console.log(images, '22222')
     return images;
   };
 
@@ -112,8 +83,8 @@ export const Slider = () => {
       let content = await RNFS.readFile(filePath, 'utf8')
 
       if (type == 'star') {
-        if (val == 1 && data[i].stare == 1) {
-          data[i].value = 0
+        if (val == 1 && data[i].value == 1) {
+          data[i].value = ""
         }
         else {
           data[i].value = val
@@ -147,13 +118,14 @@ export const Slider = () => {
           data[i].type = "Y"
         }
       }
-      content = data.map(item => `${item.url};${item.type};${item.value}`).join('\n');
+      content = data.map(item => `${`/${item.url.split('/')[11]}/${item.url.split('/')[12]}`};${item.type};${item.value}`).join('\n');
       await RNFS.writeFile(filePath, content, 'utf8');
       readFile()
     } catch (error) {
       Alert.alert(JSON.stringify(error))
     }
   };
+  // file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec/33/
 
 
   const writeFile = async () => {
@@ -178,14 +150,13 @@ export const Slider = () => {
   const readFile = async () => {
     try {
       const content = await RNFS.readFile(filePath, 'utf8')
-      let a = content
       const lines = content.split('\n');
       let array = []
 
       if (content.length > 1) {
         array = lines.map(line => {
           const [url, type, value] = line.split(';');
-          return { url, type, value };
+          return { url: `file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec/${url.split('/')[1]}/${url.split('/')[2]}`, type, value };
         });
       }
       setData(array)
@@ -210,44 +181,24 @@ export const Slider = () => {
 
 
   return <View style={styles.container}>
-    <SwiperFlatList
-      autoplayLoop
-      index={0}
-      data={data}
-      renderItem={({ item, i }) => {
-        return <View key={i} style={!isHorizontal ? styles.wrapper : styles.horizontalwrapper}>
-          {isHorizontal && <HoriznotalLike data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
-          {isHorizontal ? <ImageViewer
-            renderIndicator={() => { }}
-            renderFooter={() => { }}
-            renderHeader={() => { }}
-            renderArrowLeft={() => { }}
-            footerContainerStyle={{ display: 'none' }}
-            menuContext={{}}
-            onChange={handleChange}
-            saveToLocalByLongPress={false}
-            style={{ width: width - 75, height: height }}
-            imageUrls={data}
-            backgroundColor={'black'}
-          /> : <ImageViewer
-            renderIndicator={() => { }}
-            renderFooter={() => { }}
-            renderHeader={() => { }}
-            renderArrowLeft={() => { }}
-            footerContainerStyle={{ display: 'none' }}
-            menuContext={{}}
-            onChange={handleChange}
-            saveToLocalByLongPress={false}
-            style={{ width: width, height: height + 75 }}
-            imageUrls={data}
-            backgroundColor={'black'}
-          />
-          }
-          {!isHorizontal && <Like data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
-        </View>
-      }}
-    />
-
+    {data.length > 0 && <View style={!isHorizontal ? styles.wrapper : styles.horizontalwrapper}>
+      {isHorizontal && <HoriznotalLike data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
+      <View style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 75 }} >
+        <ImageViewer
+          renderIndicator={() => { }}
+          renderFooter={() => { }}
+          renderHeader={() => { }}
+          renderArrowLeft={() => { }}
+          footerContainerStyle={{ display: 'none' }}
+          menuContext={{}}
+          onChange={handleChange}
+          saveToLocalByLongPress={false}
+          imageUrls={data}
+          backgroundColor={'black'}
+        />
+      </View>
+      {!isHorizontal && <Like data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
+    </View>}
   </View>
 }
 

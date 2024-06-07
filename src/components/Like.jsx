@@ -17,7 +17,6 @@ export const Like = ({ i, ChangeFile, data }) => {
         <Image style={{ width: 55, height: 55 }} source={require('../../assets/dislike1.png')} />
       }
     </TouchableOpacity>
-    {/* <View style={{ flexDirection: 'row', gap: 7 }}> */}
     {emptyStarIcons.map((elm, index) => {
       if (data[i]?.value > index) {
         return <View key={index}>
@@ -32,8 +31,6 @@ export const Like = ({ i, ChangeFile, data }) => {
         </TouchableOpacity>
       </View>
     })}
-    {/* </View> */}
-
     <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
       {(data[i]?.type == "Y" || data[i]?.type == "X") ?
         <Image style={{ width: 55, height: 55 }} source={require("../../assets/like2.png")} /> :

@@ -84,9 +84,9 @@ android {
     }
     signingConfigs {
     release {
-      storeFile file('photos.keystore')
+      storeFile file('PhotoStar.keystore')
       storePassword '11111111'
-      keyAlias 'photos'
+      keyAlias 'PhotoStar'
       keyPassword '11111111'
     }
         debug {

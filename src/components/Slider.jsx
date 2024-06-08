@@ -16,7 +16,7 @@ export const Slider = () => {
   const folderPath = `${RNFS.ExternalDirectoryPath}/spec`;
   let dir = `${RNFS.ExternalDirectoryPath}/spec`;
 
-  const filePath = `${RNFS.ExternalDirectoryPath}/spec/test.txt`;
+  const filePath = `${RNFS.ExternalDirectoryPath}/spec/Photo.Stars.txt`;
 
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -133,7 +133,14 @@ export const Slider = () => {
           data[i].type = "Y"
         }
       }
-      content = data.map(item => `${`/${item.url.split('/')[11]}/${item.url.split('/')[12]}`};${item.type};${item.value}`).join('\n');
+      content = data.map(item => {
+        const parts = item.url.split('/');
+        const part11 = parts[11];
+        const part12 = parts[12];
+        const urlPart = part12 ? `/${part11}/${part12}` : `/${part11}`;
+        return `${urlPart};${item.type};${item.value}`;
+      }).join('\n');
+      // content = data.map(item => `${`/${item.url.split('/')[11]}/${item.url.split('/')[12]}`};${item.type};${item.value}`).join('\n');
       await RNFS.writeFile(filePath, content, 'utf8');
       readFile()
     } catch (error) {
@@ -185,18 +192,24 @@ export const Slider = () => {
         });
       }
       images.map((elm, i) => {
-        if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
-          array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
-          array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+        if (elm.split('/')[10]) {
+          if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
+            array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+            array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+          }
+        }
+        else {
+          if (!a.includes(`/${elm.split('/')[9]}`)) {
+            array.push({ url: `/${elm.split('/')[9]}`, value: "", type: "" })
+            array2.push({ url: `file://${dir}/${elm.split('/')[9]}`, value: "", type: "" })
+          }
         }
       })
       content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
       RNFS.writeFile(filePath, content, 'utf8');
       setData(array2)
-      console.log(images)
       readFile()
     } catch (error) {
-      console.log(error, 'error')
     }
   };
 
@@ -208,9 +221,16 @@ export const Slider = () => {
       if (content.length > 1) {
         array = lines.map(line => {
           const [url, type, value] = line.split(';');
-          return {
-            url: `file://${folderPath}/${url.split('/')[1]}/${url.split('/')[2]}`, type, value
-          };
+          if (url.split('/')[2]) {
+            return {
+              url: `file://${folderPath}/${url.split('/')[1]}/${url.split('/')[2]}`, type, value
+            };
+          }
+          else {
+            return {
+              url: `file://${folderPath}/${url.split('/')[1]}`, type, value
+            };
+          }
         });
       }
       setData(array)
@@ -218,8 +238,6 @@ export const Slider = () => {
       console.error('Error reading or writing file:', error);
     }
   };
-
-
 
   useEffect(() => {
     writeFile()
@@ -229,7 +247,6 @@ export const Slider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleChange = (index) => {
-    console.log(data[index]?.props, 'props')
     setActiveIndex(index);
   };
 

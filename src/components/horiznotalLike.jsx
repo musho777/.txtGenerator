@@ -18,8 +18,8 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
   return <View style={styles.stars}>
     <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
       {(data[i]?.type == "Y" || data[i]?.type == "X") ?
-        <Image style={{ width: 55, height: 55 }} source={require("../../assets/like2.png")} /> :
-        <Image style={{ width: 55, height: 55 }} source={require("../../assets/like3.png")} />
+        <Image style={{ width: 53, height: 53 }} source={require("../../assets/like2.png")} /> :
+        <Image style={{ width: 53, height: 53 }} source={require("../../assets/like3.png")} />
       }
     </TouchableOpacity>
     {/* <View style={{ flexDirection: 'column', gap: 15 }}> */}
@@ -27,13 +27,13 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
       if (data[i]?.value >= elm.key) {
         return <View key={index}>
           <TouchableOpacity onPress={() => ChangeFile(elm.key, 'star')}>
-            <Image source={require('../../assets/star1.png')} style={{ width: 55, height: 55 }} />
+            <Image source={require('../../assets/star1.png')} style={{ width: 53, height: 53 }} />
           </TouchableOpacity>
         </View>
       }
       return <View key={index}>
         <TouchableOpacity onPress={() => ChangeFile(elm.key, 'star')}>
-          <Image source={elm.img} style={{ width: 55, height: 55 }} />
+          <Image source={elm.img} style={{ width: 53, height: 53 }} />
         </TouchableOpacity>
       </View>
     })}
@@ -41,8 +41,8 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
 
     <TouchableOpacity onPress={() => ChangeFile(0, 'dislike')}>
       {(data[i]?.type == "N" || data[i]?.type == "X") ?
-        <Image style={{ width: 55, height: 55 }} source={require('../../assets/dislike2.png')} /> :
-        <Image style={{ width: 55, height: 55 }} source={require('../../assets/dislike1.png')} />
+        <Image style={{ width: 53, height: 53 }} source={require('../../assets/dislike2.png')} /> :
+        <Image style={{ width: 53, height: 53 }} source={require('../../assets/dislike1.png')} />
       }
     </TouchableOpacity>
   </View>
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   stars: {
     height: height,
     width: 75,
+    paddingVertical: 10,
     paddingHorizontal: 10,
     flexDirection: 'column',
     justifyContent: 'space-around',

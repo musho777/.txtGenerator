@@ -1,5 +1,5 @@
 
-import { Alert, Dimensions, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, Image, StatusBar, StyleSheet, View } from 'react-native';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -10,13 +10,13 @@ export const Slider = () => {
   const [data, setData] = useState([])
   const [width, setWidth] = useState()
   const [height, setHeight] = useState()
-
+  const [image, setImage] = useState(true)
 
   const [isHorizontal, setIsHorizontal] = useState(Dimensions.get('window').width > Dimensions.get('window').height);
   const folderPath = `${RNFS.ExternalDirectoryPath}/spec`;
+  let dir = `${RNFS.ExternalDirectoryPath}/spec`;
 
   const filePath = `${RNFS.ExternalDirectoryPath}/spec/test.txt`;
-
 
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -46,37 +46,52 @@ export const Slider = () => {
         images.push(item.path);
       }
     }
-
-    let content = await RNFS.readFile(filePath, 'utf8')
-    let a = content
-    const lines = content.split('\n');
-    let array = []
-    let array2 = []
-
-    if (content.length > 1) {
-      array = lines.map(line => {
-        const [url, type, value] = line.split(';');
-        return { url, type, value };
-      });
-      array2 = lines.map(line => {
-        const [url, type, value] = line.split(';');
-        console.log(url)
-        return { url: `file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec${url}`, type, value };
-      });
-    }
-
-    images.map((elm, i) => {
-      console.log(elm)
-      if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
-        array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
-      }
-    })
-    setData(array2)
-    content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
-    RNFS.writeFile(filePath, content, 'utf8');
-
     return images;
-  };
+    // let content = await RNFS.readFile(filePath, 'utf8')
+  }
+
+  // const getImagesFromFolder = async (folderPath) => {
+  //   const result = await RNFS.readDir(folderPath);
+  //   let images = [];
+  //   for (const item of result) {
+  //     if (item.isDirectory()) {
+  //       const nestedImages = await getImagesFromFolder(item.path);
+  //       images = images.concat(nestedImages);
+  //     } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp') || item.name.endsWith('.jpeg') || item.name.endsWith('.avif'))) {
+  //       images.push(item.path);
+  //     }
+  //   }
+
+  // let content = await RNFS.readFile(filePath, 'utf8')
+  // let a = content
+  // const lines = content.split('\n');
+  // let array = []
+  // let array2 = []
+  // if (content.length > 1) {
+  //   array = lines.map(line => {
+  //     const [url, type, value] = line.split(';');
+  //     return { url, type, value };
+  //   });
+  //   array2 = lines.map(line => {
+  //     const [url, type, value] = line.split(';');
+  //     return { url: `file://${dir}${url}`, type, value };
+  //   });
+  // }
+
+  // images.map((elm, i) => {
+  //   if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
+  //     array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+  //     array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+  //   }
+  // })
+  // content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
+  // RNFS.writeFile(filePath, content, 'utf8');
+  // setData(array2)
+
+  // return images;
+  // };
+
+
 
   const ChangeFile = async (val, type, i) => {
     try {
@@ -128,22 +143,60 @@ export const Slider = () => {
   // file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec/33/
 
 
+
+
+  // useEffect(() => {
+  //   if (image && data.length > 0) {
+  //     let a = data
+  //     setData([])
+  //     setTimeout(() => {
+  //       setData(a)
+  //     }, [3000])
+  //   }
+  // }, [])
+
+
   const writeFile = async () => {
     try {
       const folderExists = await RNFS.exists(folderPath);
       if (!folderExists) {
         await RNFS.mkdir(folderPath);
         await RNFS.writeFile(filePath, "", 'utf8');
-        getImagesFromFolder(folderPath)
       } else {
         const txtExists = await RNFS.exists(filePath);
         if (!txtExists) {
           await RNFS.writeFile(filePath, "", 'utf8');
         }
-        getImagesFromFolder(folderPath)
       }
+      let images = await getImagesFromFolder(folderPath)
+      let content = await RNFS.readFile(filePath, 'utf8')
+      let a = content
+      const lines = content.split('\n');
+      let array = []
+      let array2 = []
+      if (content.length > 1) {
+        array = lines.map(line => {
+          const [url, type, value] = line.split(';');
+          return { url, type, value };
+        });
+        array2 = lines.map(line => {
+          const [url, type, value] = line.split(';');
+          return { url: `file://${dir}${url}`, type, value };
+        });
+      }
+      images.map((elm, i) => {
+        if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
+          array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+          array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+        }
+      })
+      content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
+      RNFS.writeFile(filePath, content, 'utf8');
+      setData(array2)
+      console.log(images)
       readFile()
     } catch (error) {
+      console.log(error, 'error')
     }
   };
 
@@ -152,11 +205,12 @@ export const Slider = () => {
       const content = await RNFS.readFile(filePath, 'utf8')
       const lines = content.split('\n');
       let array = []
-
       if (content.length > 1) {
         array = lines.map(line => {
           const [url, type, value] = line.split(';');
-          return { url: `file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec/${url.split('/')[1]}/${url.split('/')[2]}`, type, value };
+          return {
+            url: `file://${folderPath}/${url.split('/')[1]}/${url.split('/')[2]}`, type, value
+          };
         });
       }
       setData(array)
@@ -164,7 +218,6 @@ export const Slider = () => {
       console.error('Error reading or writing file:', error);
     }
   };
-
 
 
 
@@ -176,14 +229,16 @@ export const Slider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleChange = (index) => {
+    console.log(data[index]?.props, 'props')
     setActiveIndex(index);
   };
 
 
   return <View style={styles.container}>
+    <StatusBar hidden={true} />
     {data.length > 0 && <View style={!isHorizontal ? styles.wrapper : styles.horizontalwrapper}>
       {isHorizontal && <HoriznotalLike data={data} ChangeFile={(i, e) => ChangeFile(i, e, activeIndex)} i={activeIndex} />}
-      <View style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 75 }} >
+      <View style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 100 }} >
         <ImageViewer
           renderIndicator={() => { }}
           renderFooter={() => { }}
@@ -192,6 +247,7 @@ export const Slider = () => {
           footerContainerStyle={{ display: 'none' }}
           menuContext={{}}
           onChange={handleChange}
+          style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 100 }}
           saveToLocalByLongPress={false}
           imageUrls={data}
           backgroundColor={'black'}

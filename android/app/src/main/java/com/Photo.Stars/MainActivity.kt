@@ -1,4 +1,4 @@
-package com.Photo.Star
+package com.Photo.Stars
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

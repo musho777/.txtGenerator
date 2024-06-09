@@ -43,53 +43,12 @@ export const Slider = () => {
         const nestedImages = await getImagesFromFolder(item.path);
         images = images.concat(nestedImages);
       } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp') || item.name.endsWith('.jpeg') || item.name.endsWith('.avif'))) {
-        images.push(item.path);
+        images.unshift(item.path);
       }
     }
+    console.log(images)
     return images;
-    // let content = await RNFS.readFile(filePath, 'utf8')
   }
-
-  // const getImagesFromFolder = async (folderPath) => {
-  //   const result = await RNFS.readDir(folderPath);
-  //   let images = [];
-  //   for (const item of result) {
-  //     if (item.isDirectory()) {
-  //       const nestedImages = await getImagesFromFolder(item.path);
-  //       images = images.concat(nestedImages);
-  //     } else if (item.isFile() && (item.name.endsWith('.jpg') || item.name.endsWith('.png') || item.name.endsWith('.webp') || item.name.endsWith('.jpeg') || item.name.endsWith('.avif'))) {
-  //       images.push(item.path);
-  //     }
-  //   }
-
-  // let content = await RNFS.readFile(filePath, 'utf8')
-  // let a = content
-  // const lines = content.split('\n');
-  // let array = []
-  // let array2 = []
-  // if (content.length > 1) {
-  //   array = lines.map(line => {
-  //     const [url, type, value] = line.split(';');
-  //     return { url, type, value };
-  //   });
-  //   array2 = lines.map(line => {
-  //     const [url, type, value] = line.split(';');
-  //     return { url: `file://${dir}${url}`, type, value };
-  //   });
-  // }
-
-  // images.map((elm, i) => {
-  //   if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
-  //     array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
-  //     array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
-  //   }
-  // })
-  // content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
-  // RNFS.writeFile(filePath, content, 'utf8');
-  // setData(array2)
-
-  // return images;
-  // };
 
 
 
@@ -147,20 +106,7 @@ export const Slider = () => {
       Alert.alert(JSON.stringify(error))
     }
   };
-  // file:///storage/emulated/0/Android/data/com.Photo.Star/files/spec/33/
 
-
-
-
-  // useEffect(() => {
-  //   if (image && data.length > 0) {
-  //     let a = data
-  //     setData([])
-  //     setTimeout(() => {
-  //       setData(a)
-  //     }, [3000])
-  //   }
-  // }, [])
 
 
   const writeFile = async () => {
@@ -194,17 +140,18 @@ export const Slider = () => {
       images.map((elm, i) => {
         if (elm.split('/')[10]) {
           if (!a.includes(`/${elm.split('/')[9]}/${elm.split('/')[10]}`)) {
-            array.push({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
-            array2.push({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+            array.unshift({ url: `/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
+            array2.unshift({ url: `file://${dir}/${elm.split('/')[9]}/${elm.split('/')[10]}`, value: "", type: "" })
           }
         }
         else {
           if (!a.includes(`/${elm.split('/')[9]}`)) {
-            array.push({ url: `/${elm.split('/')[9]}`, value: "", type: "" })
-            array2.push({ url: `file://${dir}/${elm.split('/')[9]}`, value: "", type: "" })
+            array.unshift({ url: `/${elm.split('/')[9]}`, value: "", type: "" })
+            array2.unshift({ url: `file://${dir}/${elm.split('/')[9]}`, value: "", type: "" })
           }
         }
       })
+      console.log(content, 'content')
       content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
       RNFS.writeFile(filePath, content, 'utf8');
       setData(array2)

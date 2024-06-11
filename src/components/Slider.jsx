@@ -1,5 +1,5 @@
 
-import { Alert, Dimensions, Image, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -10,7 +10,6 @@ export const Slider = () => {
   const [data, setData] = useState([])
   const [width, setWidth] = useState()
   const [height, setHeight] = useState()
-  const [image, setImage] = useState(true)
 
   const [isHorizontal, setIsHorizontal] = useState(Dimensions.get('window').width > Dimensions.get('window').height);
   const folderPath = `${RNFS.ExternalDirectoryPath}/spec`;
@@ -46,7 +45,6 @@ export const Slider = () => {
         images.unshift(item.path);
       }
     }
-    console.log(images)
     return images;
   }
 
@@ -99,7 +97,6 @@ export const Slider = () => {
         const urlPart = part12 ? `/${part11}/${part12}` : `/${part11}`;
         return `${urlPart};${item.type};${item.value}`;
       }).join('\n');
-      // content = data.map(item => `${`/${item.url.split('/')[11]}/${item.url.split('/')[12]}`};${item.type};${item.value}`).join('\n');
       await RNFS.writeFile(filePath, content, 'utf8');
       readFile()
     } catch (error) {
@@ -151,7 +148,6 @@ export const Slider = () => {
           }
         }
       })
-      console.log(content, 'content')
       content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
       RNFS.writeFile(filePath, content, 'utf8');
       setData(array2)

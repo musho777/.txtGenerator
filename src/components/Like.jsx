@@ -43,7 +43,6 @@ export const Like = ({ i, ChangeFile, data }) => {
 
 const styles = StyleSheet.create({
   stars: {
-    // height: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

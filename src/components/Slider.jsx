@@ -201,9 +201,7 @@ export const Slider = () => {
       <View style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 100 }} >
         <ImageViewer
           renderIndicator={() => { }}
-          renderFooter={() => { }}
-          renderHeader={() => { }}
-          renderArrowLeft={() => { }}
+          pageAnimateTime={500}
           footerContainerStyle={{ display: 'none' }}
           menuContext={{}}
           onChange={handleChange}

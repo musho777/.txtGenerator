@@ -1,5 +1,5 @@
 
-import { Alert, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, BackHandler, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -25,12 +25,12 @@ export const Slider = () => {
       setIsHorizontal(width > height);
     };
 
-    Dimensions.addEventListener('change', handleOrientationChange);
-
+    Dimensions?.addEventListener('change', handleOrientationChange);
     handleOrientationChange();
-
     return () => {
-      Dimensions.removeEventListener('change', handleOrientationChange);
+      if (Dimensions?.removeEventListener) {
+        Dimensions?.removeEventListener('change', handleOrientationChange);
+      }
     };
   }, []);
 

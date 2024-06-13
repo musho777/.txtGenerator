@@ -10,7 +10,7 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
   ];
 
   return <View style={styles.stars}>
-    <TouchableOpacity onPress={() => ChangeFile(0, 'like')}>
+    <TouchableOpacity activeOpacity={1} onPress={() => ChangeFile(0, 'like')}>
       {(data[i]?.type == "Y" || data[i]?.type == "X") ?
         <Image style={{ width: 53, height: 53 }} source={require("../../assets/like2.png")} /> :
         <Image style={{ width: 53, height: 53 }} source={require("../../assets/like3.png")} />
@@ -19,18 +19,18 @@ export const HoriznotalLike = ({ i, ChangeFile, data }) => {
     {emptyStarIcons.map((elm, index) => {
       if (data[i]?.value >= elm.key) {
         return <View key={index}>
-          <TouchableOpacity onPress={() => ChangeFile(elm.key, 'star')}>
+          <TouchableOpacity activeOpacity={1} onPress={() => ChangeFile(elm.key, 'star')}>
             <Image source={require('../../assets/star1.png')} style={{ width: 53, height: 53 }} />
           </TouchableOpacity>
         </View>
       }
       return <View key={index}>
-        <TouchableOpacity onPress={() => ChangeFile(elm.key, 'star')}>
+        <TouchableOpacity activeOpacity={1} onPress={() => ChangeFile(elm.key, 'star')}>
           <Image source={elm.img} style={{ width: 53, height: 53 }} />
         </TouchableOpacity>
       </View>
     })}
-    <TouchableOpacity onPress={() => ChangeFile(0, 'dislike')}>
+    <TouchableOpacity activeOpacity={1} onPress={() => ChangeFile(0, 'dislike')}>
       {(data[i]?.type == "N" || data[i]?.type == "X") ?
         <Image style={{ width: 53, height: 53 }} source={require('../../assets/dislike2.png')} /> :
         <Image style={{ width: 53, height: 53 }} source={require('../../assets/dislike1.png')} />

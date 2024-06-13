@@ -1,5 +1,5 @@
 
-import { Alert, BackHandler, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import { Like } from './Like';
 import { useEffect, useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -53,10 +53,9 @@ export const Slider = () => {
   const ChangeFile = async (val, type, i) => {
     try {
       let content = await RNFS.readFile(filePath, 'utf8')
-
       if (type == 'star') {
-        if (val == 1 && data[i].value == 1) {
-          data[i].value = ""
+        if (data[i].value == val) {
+          data[i].value = 0
         }
         else {
           data[i].value = val
@@ -148,6 +147,19 @@ export const Slider = () => {
           }
         }
       })
+      array.sort((a, b) => {
+        let partsA = a.url.split('/').filter(Boolean);
+        let partsB = b.url.split('/').filter(Boolean);
+
+        let isFolderA = partsA.length > 1;
+        let isFolderB = partsB.length > 1;
+
+        if (isFolderA && !isFolderB) return -1;
+        if (!isFolderA && isFolderB) return 1;
+
+        return a.url.localeCompare(b.url);
+      });
+      console.log(array)
       content = array.map(item => `${item.url};${item.type};${item.value}`).join('\n');
       RNFS.writeFile(filePath, content, 'utf8');
       setData(array2)
@@ -201,7 +213,7 @@ export const Slider = () => {
       <View style={isHorizontal ? { width: width - 75, height: height } : { width: width, height: height - 100 }} >
         <ImageViewer
           renderIndicator={() => { }}
-          pageAnimateTime={500}
+          pageAnimateTime={60}
           footerContainerStyle={{ display: 'none' }}
           menuContext={{}}
           onChange={handleChange}
